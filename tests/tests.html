@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+  <script src="../isProtoTypeOf.js"></script>
+  <script src="simpletest.js"></script>
+  <script type="text/javascript">
+  var canine = {
+  bark: function() {
+    console.log('bark');
+    }
+  };
+
+  var dog = Object.create(canine);
+  dog.fetch = function() {
+    console.log('fetch');
+  };
+
+  var myDog = Object.create(dog);
+  var empty = Object.create(null);
+
+tests({
+  'isProtoTypeOf should return false if only one object is passed through.':function(){
+    eq(isProtoTypeOf(myDog), false)
+  },
+  'If the object does not have a prototype, isProtoTypeOf should return false':function(){
+    var obj = Object.getPrototypeOf({});
+    var result = isProtoTypeOf(myDog,obj);
+    eq(result, false);
+  },
+  'It should return false if the second object is in not the prototype chain of the first.':function(){
+    var result = isProtoTypeOf(myDog,empty);
+    eq(result, false)
+  },
+  'It should return true if the second object is a prototype of the first.':function(){
+    var result = isProtoTypeOf(dog, myDog);
+    eq(result, true)
+  },
+  'It work for any number of prototype links (recursion test).':function(){
+    var result = isProtoTypeOf(canine, myDog);
+    eq(result, true);
+  },
+  'isProtoTypeOf should return true when comparing any object to the ObjectPrototype.':function(){
+    var result = isProtoTypeOf(Object.prototype, myDog);
+    eq(result, true);
+  },
+
+  'It should throw TypeError if prototypeObject is undefined or null.': function () {
+    try {
+      isPrototypeOf(undefined, myDog);
+    } catch (error) {
+      eq(error instanceof TypeError, true);
+    }
+    try {
+      isPrototypeOf(null, myDog);
+    } catch (error) {
+      eq(error instanceof TypeError, true);
+    }
+  },
+})
+  </script>
+</body>
+</html>
